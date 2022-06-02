@@ -1,12 +1,43 @@
 <template>
-    <div class="card" :class="{ disabled: isDisabled }">
+    <div
+        class="card"
+        :class="{ disabled: isDisabled }"
+        :style="{
+            height: `${(920 - 16 * 4) / Math.sqrt(cardsContext.length) - 16}px`,
+            width: `${
+                (((920 - 16 * 4) / Math.sqrt(cardsContext.length) - 16) * 3) / 4
+            }px`,
+            perspective: `${
+                ((((920 - 16 * 4) / Math.sqrt(cardsContext.length) - 16) * 3) /
+                    4) *
+                2
+            }px`,
+        }"
+    >
         <div
             class="card__inner"
             :class="{ 'is-flipped': isFlipped }"
             @click="onToggleFlipCard"
         >
             <div class="card__face card__face--front">
-                <div class="card__content"></div>
+                <div
+                    class="card__content"
+                    :style="{
+                        backgroundSize: `${
+                            (((920 - 16 * 4) / Math.sqrt(cardsContext.length) -
+                                16) *
+                                3) /
+                            4 /
+                            3
+                        }px ${
+                            (((920 - 16 * 4) / Math.sqrt(cardsContext.length) -
+                                16) *
+                                3) /
+                            4 /
+                            3
+                        }px`,
+                    }"
+                ></div>
             </div>
             <div class="card__face card__face--back">
                 <div
@@ -30,7 +61,16 @@ export default {
             required: true,
         },
         card: {
-            type: [String, Number, Array, Object]
+            type: [String, Number, Array, Object],
+        },
+        cardsContext: {
+            type: Array,
+        },
+        disabled: {
+            type: Boolean
+        },
+        rules: {
+            type: Array
         }
     },
     data() {
@@ -41,18 +81,26 @@ export default {
     },
     methods: {
         onToggleFlipCard() {
-            if(this.isDisabled) return false;
+            if(this.rules.length === 2) return false;
+            if (this.isDisabled) return false;
             this.isFlipped = !this.isFlipped;
-            if(this.isFlipped) this.$emit('onFlip', this.card);
+            if (this.isFlipped) {
+                this.$emit("onFlip", this.card);
+            } else {
+                this.$emit("onCloseFlip", this.card);
+            }
         },
 
-        onBackFlipCard: function() {
-            this.isFlipped = false
+        onBackFlipCard: function () {
+            this.isFlipped = false;
         },
-        
+
         onDisabledCard() {
-            this.isDisabled = true
-        }
+            this.isDisabled = true;
+        },
+        onEnabledCard() {
+            this.isDisabled = false;
+        },
     },
 };
 </script>
@@ -62,8 +110,6 @@ export default {
     display: inline-block;
     margin-right: 1rem;
     margin-bottom: 1rem;
-    height: 120px;
-    width: 90px;
 }
 
 .card.disabled .card__inner {
@@ -89,7 +135,7 @@ export default {
     overflow: hidden;
     border-radius: 1rem;
     padding: 1rem;
-    box-shadow: 0 3px 10px 2px #ccc;
+    box-shadow: 0 3px 18px 3px rgb(0 0 0 / 20%);
 }
 
 .card__face--front .card__content {
@@ -100,7 +146,7 @@ export default {
 }
 
 .card__face--back {
-    background-color: var(--white);
+    background-color: var(--white-color);
     transform: rotateY(-180deg);
 }
 
